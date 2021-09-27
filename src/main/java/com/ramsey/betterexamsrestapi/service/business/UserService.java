@@ -159,4 +159,86 @@ public class UserService implements UserDetailsService {
 		
 	}
 	
+	public Response<?> updateUser(User newUser, String username) {
+		
+		Optional<User> user = userRepo.findById(username);
+		boolean emailChanged = false;
+		
+		if(user.isEmpty()) {
+			
+			return new Response<>(404, "The user you're looking for was not found");
+			
+		}
+		
+		user.get().setFullName(newUser.getFullName());
+		user.get().setEnabled(false);
+		
+		if(!user.get().getEmail().equals(newUser.getEmail())) {
+			
+			emailChanged = true;
+			
+			if(userRepo.existsByEmail(newUser.getEmail())) {
+				
+				return new Response<>(403, "Email already exists");
+				
+			} else {
+				
+				user.get().setEmail(newUser.getEmail());
+				user.get().setEnabled(false);
+				
+			}
+			
+		}
+		
+		if(newUser.getPassword() != null && !user.get().getPassword().equals(newUser.getPassword())) {
+			
+			if(!passwordPattern.matcher(newUser.getPassword()).matches()) {
+				
+				return new Response<>(403, "Invalid password");
+				
+			}
+			
+			user.get().setPassword(passwordEncoder.encode(newUser.getPassword()));
+			
+		}
+		
+		userRepo.save(user.get());
+		
+		if(emailChanged) {
+			
+			sendVerificationEmail(username);
+			
+		}
+		
+		return new Response<>(200, "User updated successfully");
+		
+	}
+	
+	public Response<?> deleteUser(String username) {
+		
+		Optional<User> user = userRepo.findById(username);
+		
+		if(user.isEmpty()) {
+			
+			return new Response<>(404, "The user you're looking for was not found");
+			
+		}
+		
+		switch(user.get().getUserType()) {
+			
+			case TEACHER:
+				Optional<Teacher> teacher = teacherRepo.findByUser(user.get());
+				teacher.ifPresent(teacherRepo::delete);
+				break;
+			case STUDENT:
+				Optional<Student> student = studentRepo.findByUser(user.get());
+				student.ifPresent(studentRepo::delete);
+				break;
+			
+		}
+		
+		return new Response<>(200, "User deleted successfully");
+		
+	}
+	
 }

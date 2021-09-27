@@ -17,6 +17,7 @@ import java.util.Date;
 public class ExamResult {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
 	@NonNull

@@ -1,10 +1,10 @@
 package com.ramsey.betterexamsrestapi.service.business;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
 import com.ramsey.betterexamsrestapi.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,31 +34,31 @@ public class StudentService {
 		
 	}
 	
-	public Response<?> getStudent(String username) {
+	public User getStudent(String username) {
 		
 		Optional<User> student = userRepo.findById(username);
 		
 		if(student.isEmpty()) {
 			
-			return new Response<>(404, "The user that you're looking for was not found");
+			throw new UsernameNotFoundException(username);
 			
 		}
 		
-		return new Response<>(200, student.get());
+		return student.get();
 		
 	}
 	
-	public Response<?> getStudentForTeacher(String studentUsername, String teacherUsername) {
+	public User getStudentForTeacher(String studentUsername, String teacherUsername) {
 		
 		Optional<User> student = userRepo.findStudentForTeacher(studentUsername, teacherUsername);
 		
 		if(student.isEmpty()) {
 			
-			return new Response<>(404, "The user that you're looking for was not found");
+			throw new UsernameNotFoundException(studentUsername);
 			
 		}
 		
-		return new Response<>(200, student.get());
+		return student.get();
 		
 	}
 	

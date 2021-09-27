@@ -1,9 +1,11 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
+import com.ramsey.betterexamsrestapi.error.*;
+import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,26 @@ public class UserResource {
 			@RequestBody User user
 	) {
 		
-		Response<?> responseBody = userService.addUser(user);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			user = userService.addUser(user);
+			
+		} catch(UserAlreadyExistsError | PasswordFormatError err) {
+			
+			var status = HttpStatus.FORBIDDEN;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+			
+		}
+		
+		return ResponseEntity.ok(user);
 		
 	}
 	
@@ -33,9 +52,38 @@ public class UserResource {
 			@RequestBody User user
 	) {
 		
-		Response<?> responseBody = userService.updateUser(user, username);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			user = userService.updateUser(user, username);
+			
+		} catch(UserAlreadyExistsError | PasswordFormatError err) {
+			
+			var status = HttpStatus.FORBIDDEN;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.ok(user);
 		
 	}
 	
@@ -45,9 +93,25 @@ public class UserResource {
 			@PathVariable String username
 	) {
 		
-		Response<?> responseBody = userService.deleteUser(username);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			userService.deleteUser(username);
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.noContent().build();
 		
 	}
 	
@@ -57,9 +121,25 @@ public class UserResource {
 			@PathVariable String username
 	) {
 		
-		Response<?> responseBody = userService.sendVerificationEmail(username);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			userService.sendVerificationEmail(username);
+			
+		} catch(Exception ex) {
+			
+			var status = HttpStatus.INTERNAL_SERVER_ERROR;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									ex.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.noContent().build();
 		
 	}
 	
@@ -70,9 +150,49 @@ public class UserResource {
 			@RequestBody String verificationCode
 	) {
 		
-		Response<?> responseBody = userService.verify(username, verificationCode);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			userService.verify(username, verificationCode);
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		} catch(UserAlreadyVerifiedError | VerificationCodeNotCorrectError err) {
+			
+			var status = HttpStatus.FORBIDDEN;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		} catch(Exception ex) {
+			
+			var status = HttpStatus.INTERNAL_SERVER_ERROR;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									ex.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.noContent().build();
 		
 	}
 	

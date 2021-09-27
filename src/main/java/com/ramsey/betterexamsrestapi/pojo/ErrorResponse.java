@@ -7,9 +7,10 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response<T> {
+public class ErrorResponse {
 	
 	private Integer status;
-	private T message;
+	private String error;
+	private String message;
 	
 }

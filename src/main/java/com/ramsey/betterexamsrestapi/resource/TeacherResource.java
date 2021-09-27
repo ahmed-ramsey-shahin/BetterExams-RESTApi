@@ -1,9 +1,11 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
+import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
+import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.TeacherService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -37,8 +39,7 @@ public class TeacherResource {
 			
 		}
 		
-		Response<?> responseBody = new Response<>(200, teachers);
-		return ResponseEntity.status(responseBody.getStatus()).body(responseBody);
+		return ResponseEntity.ok(teachers);
 		
 	}
 	
@@ -48,9 +49,27 @@ public class TeacherResource {
 			@PathVariable String username
 	) {
 		
-		Response<?> responseBody = teacherService.get(username);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		User user;
+		
+		try {
+			
+			user = teacherService.get(username);
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.ok(user);
 		
 	}
 	
@@ -61,12 +80,28 @@ public class TeacherResource {
 			Authentication authentication
 	) {
 		
-		Response<?> responseBody = teacherService.addStudentToTeacher(
-				authentication.getName(),
-				username
-		);
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		try {
+			
+			teacherService.addStudentToTeacher(
+					authentication.getName(),
+					username
+			);
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status)
+					.body(
+							new ErrorResponse(
+									status.value(),
+									status.getReasonPhrase(),
+									err.getMessage()
+							)
+					);
+			
+		}
+		
+		return ResponseEntity.noContent().build();
 		
 	}
 	

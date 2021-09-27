@@ -4,12 +4,12 @@ import com.ramsey.betterexamsrestapi.entity.Student;
 import com.ramsey.betterexamsrestapi.entity.Teacher;
 import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
-import com.ramsey.betterexamsrestapi.pojo.Response;
 import com.ramsey.betterexamsrestapi.repo.StudentRepo;
 import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import com.ramsey.betterexamsrestapi.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class TeacherService {
 		
 	}
 	
-	public Response<?> get(String username) {
+	public User get(String username) {
 		
 		Optional<User> teacher = userRepo.findByUsernameAndType(
 				username,
@@ -50,28 +50,31 @@ public class TeacherService {
 		
 		if(teacher.isEmpty()) {
 			
-			return new Response<>(404, "The user that you're looking for was not found");
+			throw new UsernameNotFoundException(username);
 			
 		}
 		
-		return new Response<>(200, teacher);
+		return teacher.get();
 		
 	}
 	
-	public Response<?> addStudentToTeacher(String studentUsername, String teacherUsername) {
+	public void addStudentToTeacher(String studentUsername, String teacherUsername) {
 		
 		Optional<Teacher> teacher = teacherRepo.findByUsername(teacherUsername);
 		Optional<Student> student = studentRepo.findByUsername(studentUsername);
 		
-		if(teacher.isEmpty() || student.isEmpty()) {
+		if(teacher.isEmpty()) {
 			
-			return new Response<>(404, "The user that you're looking for was not found");
+			throw new UsernameNotFoundException(teacherUsername);
+			
+		} else if(student.isEmpty()) {
+			
+			throw new UsernameNotFoundException(studentUsername);
 			
 		}
 		
 		teacher.get().getStudents().add(student.get());
 		teacherRepo.save(teacher.get());
-		return new Response<>(200, "Student added successfully");
 		
 	}
 	

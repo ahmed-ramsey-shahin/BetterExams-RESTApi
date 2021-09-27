@@ -1,9 +1,11 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
+import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
+import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,8 +40,7 @@ public class StudentResource {
 			
 		}
 		
-		Response<?> responseBody = new Response<>(200, students);
-		return ResponseEntity.status(responseBody.getStatus()).body(responseBody);
+		return ResponseEntity.ok(students);
 		
 	}
 	
@@ -50,29 +51,51 @@ public class StudentResource {
 			Authentication authentication
 	) {
 		
-		Response<?> responseBody;
+		User user;
 		
-		if(
-				authentication.getAuthorities()
-						.stream()
-						.anyMatch(
-								authority -> authority.getAuthority().equals("ROLE_TEACHER")
-						)
-		) {
+		try {
 			
-			responseBody = studentService.getStudentForTeacher(
-					username,
-					authentication.getName()
+			if(
+					authentication.getAuthorities()
+							.stream()
+							.anyMatch(
+									authority -> authority.getAuthority().equals("ROLE_TEACHER")
+							)
+			) {
+				
+				user = studentService.getStudentForTeacher(username, authentication.getName());
+				
+			} else {
+				
+				user = studentService.getStudent(username);
+				
+			}
+			
+		} catch(UserNotFoundError err) {
+			
+			var status = HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(status).body(
+					new ErrorResponse(
+							status.value(),
+							status.getReasonPhrase(),
+							err.getMessage()
+					)
 			);
 			
-		} else {
+		} catch(Exception ex) {
 			
-			responseBody = studentService.getStudent(username);
+			var status = HttpStatus.INTERNAL_SERVER_ERROR;
+			return ResponseEntity.status(status).body(
+					new ErrorResponse(
+							status.value(),
+							status.getReasonPhrase(),
+							ex.getMessage()
+					)
+			);
 			
 		}
 		
-		return ResponseEntity.status(responseBody.getStatus())
-				.body(responseBody);
+		return ResponseEntity.ok(user);
 		
 	}
 	

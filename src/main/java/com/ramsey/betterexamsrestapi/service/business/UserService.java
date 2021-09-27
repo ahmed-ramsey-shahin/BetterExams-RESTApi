@@ -3,7 +3,7 @@ package com.ramsey.betterexamsrestapi.service.business;
 import com.ramsey.betterexamsrestapi.entity.Student;
 import com.ramsey.betterexamsrestapi.entity.Teacher;
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
+import com.ramsey.betterexamsrestapi.error.*;
 import com.ramsey.betterexamsrestapi.repo.StudentRepo;
 import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import com.ramsey.betterexamsrestapi.repo.UserRepo;
@@ -42,22 +42,17 @@ public class UserService implements UserDetailsService {
 		
 	}
 	
-	public Response<?> addUser(User user) {
-		
-		Response<String> forbiddenResponse = new Response<>();
-		forbiddenResponse.setStatus(403);
+	public User addUser(User user) {
 		
 		if(!passwordPattern.matcher(user.getPassword()).matches()) {
 			
-			forbiddenResponse.setMessage("Invalid password");
-			return forbiddenResponse;
+			throw new PasswordFormatError();
 			
 		}
 		
 		if(userRepo.existsByUsernameOrEmail(user.getUsername(), user.getEmail())) {
 			
-			forbiddenResponse.setMessage("Username, or email already exists");
-			return forbiddenResponse;
+			throw new UserAlreadyExistsError();
 			
 		}
 		
@@ -76,50 +71,39 @@ public class UserService implements UserDetailsService {
 			
 		}
 		
-		Response<?> verificationEmailResponse = sendVerificationEmail(user.getUsername());
-		
-		if(!verificationEmailResponse.getStatus().equals(200)) {
-			
-			return verificationEmailResponse;
-			
-		}
-		
-		return new Response<>(200, user);
+		sendVerificationEmail(user.getUsername());
+		return user;
 		
 	}
 	
-	public Response<?> sendVerificationEmail(String username) {
+	public void sendVerificationEmail(String username) {
 		
 		Optional<User> user = userRepo.findById(username);
 		
 		if(user.isEmpty()) {
 			
-			return new Response<>(404, "The user that you're looking for was not found");
+			throw new UsernameNotFoundException(username);
 			
 		}
 		
 		if(user.get().isEnabled()) {
 			
-			return new Response<>(
-					403,
-					"The user is already verified"
-			);
+			throw new UserAlreadyVerifiedError(username);
 			
 		}
 		
 		String code = emailSender.sendConfirmationEmail(user.get().getEmail());
 		jedis.setex(user.get().getUsername(), (60L * 60L), code);
-		return new Response<>(200, "Verification code sent successfully");
 		
 	}
 	
-	public Response<?> verify(String username, String code) {
+	public void verify(String username, String code) {
 		
 		Optional<User> user = userRepo.findById(username);
 		
 		if(user.isEmpty()) {
 			
-			return new Response<>(404, "The user you're looking for was not found");
+			throw new UserNotFoundError(username);
 			
 		}
 		
@@ -132,19 +116,19 @@ public class UserService implements UserDetailsService {
 					user.get().setEnabled(true);
 					userRepo.save(user.get());
 					jedis.del(username);
-					return new Response<>(200, "User verified successfully");
+					return;
 					
 				}
 				
-				return new Response<>(403, "The verification code is not correct");
+				throw new VerificationCodeNotCorrectError();
 				
 			}
 			
-			return new Response<>(403, "There is no verification code for this user");
+			throw new VerificationCodeNotCorrectError();
 			
 		}
 		
-		return new Response<>(403, "The user is already verified");
+		throw new UserAlreadyVerifiedError(username);
 		
 	}
 	
@@ -163,14 +147,14 @@ public class UserService implements UserDetailsService {
 		
 	}
 	
-	public Response<?> updateUser(User newUser, String username) {
+	public User updateUser(User newUser, String username) {
 		
 		Optional<User> user = userRepo.findById(username);
 		boolean emailChanged = false;
 		
 		if(user.isEmpty()) {
 			
-			return new Response<>(404, "The user you're looking for was not found");
+			throw new UserNotFoundError(username);
 			
 		}
 		
@@ -183,7 +167,7 @@ public class UserService implements UserDetailsService {
 			
 			if(userRepo.existsByEmail(newUser.getEmail())) {
 				
-				return new Response<>(403, "Email already exists");
+				throw new UserAlreadyExistsError();
 				
 			} else {
 				
@@ -198,7 +182,7 @@ public class UserService implements UserDetailsService {
 			
 			if(!passwordPattern.matcher(newUser.getPassword()).matches()) {
 				
-				return new Response<>(403, "Invalid password");
+				throw new PasswordFormatError();
 				
 			}
 			
@@ -214,17 +198,17 @@ public class UserService implements UserDetailsService {
 			
 		}
 		
-		return new Response<>(200, user.get());
+		return user.get();
 		
 	}
 	
-	public Response<?> deleteUser(String username) {
+	public void deleteUser(String username) {
 		
 		Optional<User> user = userRepo.findById(username);
 		
 		if(user.isEmpty()) {
 			
-			return new Response<>(404, "The user you're looking for was not found");
+			throw new UserNotFoundError(username);
 			
 		}
 		
@@ -240,8 +224,6 @@ public class UserService implements UserDetailsService {
 				break;
 			
 		}
-		
-		return new Response<>(200, "User deleted successfully");
 		
 	}
 	

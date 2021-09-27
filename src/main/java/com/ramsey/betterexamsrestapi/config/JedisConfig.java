@@ -17,7 +17,7 @@ public class JedisConfig {
 		
 		return new Jedis(
 				propertiesReader.get("host", PropertiesReaderService.REDIS),
-				(Integer) propertiesReader.getObject("port", PropertiesReaderService.REDIS)
+				Integer.parseInt(propertiesReader.get("port", PropertiesReaderService.REDIS))
 		);
 		
 	}

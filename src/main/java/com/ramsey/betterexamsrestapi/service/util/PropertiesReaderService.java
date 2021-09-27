@@ -13,7 +13,7 @@ public class PropertiesReaderService {
 	public static final int REDIS = 1;
 	public static final int EMAIL = 2;
 	private static final String JEDIS_FILE = "jedis.properties";
-	private static final String EMAIL_FILE = "emai;.properties";
+	private static final String EMAIL_FILE = "email.properties";
 	private Properties jedisProperties;
 	private Properties emailProperties;
 	

@@ -1,14 +1,9 @@
 package com.ramsey.betterexamsrestapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +11,16 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class Student {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@OneToOne(targetEntity = User.class)
+	@OneToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+	@NonNull
 	private User user;
 	
 	@OneToMany(targetEntity = ExamResult.class)

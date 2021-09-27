@@ -2,6 +2,7 @@ package com.ramsey.betterexamsrestapi.entity;
 
 import lombok.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -32,7 +33,7 @@ public class Exam {
 	@Min(1)
 	private Double requiredScore;
 	
-	@ManyToMany(targetEntity = Question.class)
+	@ManyToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
 	@ToString.Exclude
 	@Size(min = 5)
 	private Set<Question> questions;

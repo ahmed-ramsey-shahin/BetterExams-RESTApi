@@ -48,10 +48,7 @@ public class AuthFilter extends OncePerRequestFilter {
 			FilterChain filterChain
 	) throws ServletException, IOException {
 		
-		if(
-				request.getRequestURI().matches("^.*(teachers)(|\\/)$") ||
-				request.getRequestURI().matches("^.*(students)(|\\/)$")
-		) {
+		if(request.getRequestURI().matches("^.*(users)(|\\/)$")) {
 			
 			if(request.getMethod().equalsIgnoreCase("post")) {
 				

@@ -210,7 +210,7 @@ public class UserService implements UserDetailsService {
 			
 		}
 		
-		return new Response<>(200, "User updated successfully");
+		return new Response<>(200, user.get());
 		
 	}
 	

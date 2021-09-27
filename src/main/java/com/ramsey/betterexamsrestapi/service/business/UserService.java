@@ -9,6 +9,7 @@ import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import com.ramsey.betterexamsrestapi.repo.UserRepo;
 import com.ramsey.betterexamsrestapi.service.util.EmailSenderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -64,9 +66,11 @@ public class UserService implements UserDetailsService {
 		switch(user.getUserType()) {
 			
 			case TEACHER:
+				user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_TEACHER")));
 				teacherRepo.save(new Teacher(user));
 				break;
 			case STUDENT:
+				user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
 				studentRepo.save(new Student(user));
 				break;
 			

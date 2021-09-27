@@ -1,6 +1,6 @@
 package com.ramsey.betterexamsrestapi.resource;
 
-import com.ramsey.betterexamsrestapi.entity.Teacher;
+import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.pojo.Response;
 import com.ramsey.betterexamsrestapi.service.business.TeacherService;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ public class TeacherResource {
 	private final TeacherService teacherService;
 	
 	@GetMapping
-	@PreAuthorize("hasRole('STUDENTS')")
+	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<?> searchTeachers(
 			@RequestParam(required = false, defaultValue = "-1") Integer limit,
 			@RequestParam String name
 	) {
 		
-		List<Teacher> teachers;
+		List<User> teachers;
 		
 		if(limit <= 0) {
 			

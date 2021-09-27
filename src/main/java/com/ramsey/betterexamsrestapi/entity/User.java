@@ -48,10 +48,9 @@ public class User implements UserDetails {
 	private boolean enabled;
 	
 	@JsonIgnore
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private List<SimpleGrantedAuthority> authorities;
 	
-	@JsonIgnore
 	@Enumerated(value = EnumType.STRING)
 	private UserType userType;
 	

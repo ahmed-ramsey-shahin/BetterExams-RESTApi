@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface StudentRepo extends CrudRepository<Student, Long> {
 	
 	Optional<Student> findByUser(User user);
+	
 	@Query("SELECT s FROM Student s, IN(s.user) u WHERE u.username = :username")
 	Optional<Student> findByUsername(String username);
 	

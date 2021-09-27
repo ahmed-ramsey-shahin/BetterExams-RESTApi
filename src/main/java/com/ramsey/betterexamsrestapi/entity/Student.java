@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,11 +26,11 @@ public class Student {
 	@OneToMany(targetEntity = ExamResult.class)
 	@ToString.Exclude
 	@JsonIgnore
-	private List<ExamResult> results;
+	private Set<ExamResult> results;
 	
 	{
 		
-		results = new ArrayList<>();
+		results = new HashSet<>();
 		
 	}
 	

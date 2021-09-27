@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,17 +26,17 @@ public class Teacher {
 	@ManyToMany
 	@ToString.Exclude
 	@JsonIgnore
-	private List<Student> students;
+	private Set<Student> students;
 	
 	@OneToMany
 	@ToString.Exclude
 	@JsonIgnore
-	private List<Exam> exams;
+	private Set<Exam> exams;
 	
 	{
 		
-		students = new ArrayList<>();
-		exams = new ArrayList<>();
+		students = new HashSet<>();
+		exams = new HashSet<>();
 		
 	}
 	

@@ -8,8 +8,8 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -35,11 +35,11 @@ public class Exam {
 	@ManyToMany(targetEntity = Question.class)
 	@ToString.Exclude
 	@Size(min = 5)
-	private List<Question> questions;
+	private Set<Question> questions;
 	
 	{
 		
-		questions = new ArrayList<>();
+		questions = new HashSet<>();
 		
 	}
 	

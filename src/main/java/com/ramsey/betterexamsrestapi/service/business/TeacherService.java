@@ -23,19 +23,19 @@ public class TeacherService {
 	private final UserRepo userRepo;
 	private final StudentRepo studentRepo;
 	
-	private List<Teacher> search(String name, Pageable pageable) {
+	private List<User> search(String name, Pageable pageable) {
 		
-		return teacherRepo.findByName(name, pageable);
+		return userRepo.findByName(name, UserType.TEACHER, pageable);
 		
 	}
 	
-	public List<Teacher> search(String name, Integer limit) {
+	public List<User> search(String name, Integer limit) {
 		
 		return search(name, Pageable.ofSize(limit));
 		
 	}
 	
-	public List<Teacher> search(String name) {
+	public List<User> search(String name) {
 		
 		return search(name, Pageable.unpaged());
 		

@@ -43,7 +43,7 @@ public class TeacherService {
 	
 	public Response<?> get(String username) {
 		
-		Optional<User> teacher = userRepo.findByUsernameAndUserType(
+		Optional<User> teacher = userRepo.findByUsernameAndType(
 				username,
 				UserType.TEACHER
 		);

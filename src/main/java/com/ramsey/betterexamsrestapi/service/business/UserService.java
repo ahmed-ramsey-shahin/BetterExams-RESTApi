@@ -63,7 +63,7 @@ public class UserService implements UserDetailsService {
 		
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		
-		switch(user.getUserType()) {
+		switch(user.getType()) {
 			
 			case TEACHER:
 				user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_TEACHER")));
@@ -228,7 +228,7 @@ public class UserService implements UserDetailsService {
 			
 		}
 		
-		switch(user.get().getUserType()) {
+		switch(user.get().getType()) {
 			
 			case TEACHER:
 				Optional<Teacher> teacher = teacherRepo.findByUser(user.get());

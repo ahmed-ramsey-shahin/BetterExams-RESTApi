@@ -37,7 +37,8 @@ public class TeacherResource {
 			
 		}
 		
-		return ResponseEntity.ok(teachers);
+		Response<?> responseBody = new Response<>(200, teachers);
+		return ResponseEntity.status(responseBody.getStatus()).body(responseBody);
 		
 	}
 	

@@ -52,7 +52,7 @@ public class User implements UserDetails {
 	private List<SimpleGrantedAuthority> authorities;
 	
 	@Enumerated(value = EnumType.STRING)
-	private UserType userType;
+	private UserType type;
 	
 	{
 		

@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
-public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class UserExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({
 			UserAlreadyExistsError.class,

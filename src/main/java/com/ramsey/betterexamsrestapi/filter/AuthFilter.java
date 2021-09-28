@@ -2,10 +2,11 @@ package com.ramsey.betterexamsrestapi.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.pojo.Response;
+import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.UserService;
 import com.ramsey.betterexamsrestapi.service.util.DigestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,8 +61,9 @@ public class AuthFilter extends OncePerRequestFilter {
 		}
 		
 		String authHeader = request.getHeader(AUTHORIZATION);
-		Response<String> responseBody = new Response<>();
-		responseBody.setStatus(403);
+		ErrorResponse errorResponse = new ErrorResponse();
+		var status = HttpStatus.FORBIDDEN;
+		errorResponse.setStatus(status.value());
 		
 		try {
 			
@@ -123,43 +125,44 @@ public class AuthFilter extends OncePerRequestFilter {
 							
 						}
 						
-						responseBody.setMessage("Invalid hmac");
+						errorResponse.setMessage("Invalid hmac");
 						
 					} else {
 						
-						responseBody.setMessage("User is not enabled");
+						errorResponse.setMessage("User is not enabled");
 						
 					}
 					
 				} else {
 					
-					responseBody.setMessage("Invalid date");
+					errorResponse.setMessage("Invalid date");
 				
 				}
 				
 			} else {
 				
-				responseBody.setMessage("Auth method is not supported");
+				errorResponse.setMessage("Auth method is not supported");
 				
 			}
 			
 		} catch(NullPointerException ex) {
 			
-			responseBody.setMessage("Invalid authentication header");
+			errorResponse.setMessage("Invalid authentication header");
 			
 		} catch(UsernameNotFoundException ex) {
 			
-			responseBody.setMessage("Invalid username");
+			errorResponse.setMessage("Invalid username");
 			
 		} catch(ParseException ex) {
 			
-			responseBody.setMessage("Invalid date format");
+			errorResponse.setMessage("Invalid date format");
 			
 		}
 		
+		errorResponse.setError(status.getReasonPhrase());
 		response.setContentType("application/json");
-		response.setStatus(responseBody.getStatus());
-		new ObjectMapper().writeValue(response.getWriter(), responseBody);
+		response.setStatus(errorResponse.getStatus());
+		new ObjectMapper().writeValue(response.getWriter(), errorResponse);
 		
 	}
 	

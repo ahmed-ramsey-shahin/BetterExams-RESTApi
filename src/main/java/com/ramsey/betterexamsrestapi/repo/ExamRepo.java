@@ -15,5 +15,10 @@ public interface ExamRepo extends CrudRepository<Exam, Long> {
 	List<Exam> searchExamForStudent(String username, String examName, Pageable pageable);
 	@Query("SELECT e FROM Teacher t, IN(t.exams) e WHERE t.user.username = :username AND e.name LIKE %:examName% ORDER BY e.id")
 	List<Exam> searchExamForTeacher(String username, String examName, Pageable pageable);
+	@Query("SELECT CASE WHEN COUNT(e) > 0 THEN TRUE " +
+			"ELSE FALSE END " +
+			"FROM Teacher t, IN(t.students) s, IN(t.exams) e " +
+			"WHERE s.user.username = :username AND e.id = :id")
+	Boolean studentCanAccess(String username, Long id);
 	
 }

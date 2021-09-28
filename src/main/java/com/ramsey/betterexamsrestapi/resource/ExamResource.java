@@ -65,6 +65,16 @@ public class ExamResource {
 		
 	}
 	
+	@GetMapping("{examId}")
+	@PreAuthorize("@examService.canAccess(authentication.name, #examId, authentication.authorities) == true")
+	public ResponseEntity<?> exam(
+			@PathVariable Long examId
+	) {
+		
+		return ResponseEntity.ok(examService.get(examId));
+		
+	}
+	
 	@PostMapping
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addExam(

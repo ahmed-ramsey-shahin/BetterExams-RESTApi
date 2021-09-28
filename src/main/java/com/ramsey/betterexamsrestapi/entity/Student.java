@@ -19,13 +19,13 @@ public class Student {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@OneToOne(targetEntity = User.class, cascade = CascadeType.ALL)
 	@NonNull
+	@OneToOne(targetEntity = User.class, cascade = CascadeType.ALL)
 	private User user;
 	
-	@OneToMany(targetEntity = ExamResult.class)
-	@ToString.Exclude
 	@JsonIgnore
+	@ToString.Exclude
+	@OneToMany(targetEntity = ExamResult.class)
 	private Set<ExamResult> results;
 	
 	{

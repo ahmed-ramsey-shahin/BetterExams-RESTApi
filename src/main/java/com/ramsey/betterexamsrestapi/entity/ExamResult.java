@@ -20,20 +20,20 @@ public class ExamResult {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@NonNull
 	@Min(0)
+	@NonNull
 	private Integer score;
 	
-	@ManyToOne(targetEntity = Exam.class, fetch = FetchType.EAGER)
 	@NonNull
+	@ManyToOne(targetEntity = Exam.class, fetch = FetchType.EAGER)
 	private Exam exm;
 	
 	@NonNull
 	@Temporal(TemporalType.DATE)
 	private Date date;
 	
-	@NonNull
 	@Min(0)
+	@NonNull
 	private Integer noOfSolvedQuestions;
 	
 	{

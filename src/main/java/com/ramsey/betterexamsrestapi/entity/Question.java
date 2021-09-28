@@ -26,12 +26,12 @@ public class Question {
 	@Pattern(regexp = "^(?=.*[a-z])[^<>]{5,}$")
 	private String question;
 	
-	@ElementCollection
 	@Size(min = 2)
+	@ElementCollection
 	private List<String> answers;
 	
-	@NonNull
 	@Min(1)
+	@NonNull
 	private Integer score;
 	
 	@NotBlank

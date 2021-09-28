@@ -22,6 +22,7 @@ public class Exam {
 	private Long id;
 	
 	@NonNull
+	@Column(unique = true)
 	@Pattern(regexp = "^(?=.*[a-z])[^<>]{5,}$")
 	private String name;
 	
@@ -31,9 +32,9 @@ public class Exam {
 	@Min(1)
 	private Double requiredScore;
 	
-	@ManyToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
-	@ToString.Exclude
 	@Size(min = 5)
+	@ToString.Exclude
+	@ManyToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
 	private Set<Question> questions;
 	
 	{

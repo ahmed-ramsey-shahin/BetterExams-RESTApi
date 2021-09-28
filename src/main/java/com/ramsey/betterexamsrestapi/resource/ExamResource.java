@@ -67,7 +67,7 @@ public class ExamResource {
 	
 	@GetMapping("{examId}")
 	@PreAuthorize("@examService.canAccess(authentication.name, #examId, authentication.authorities) == true")
-	public ResponseEntity<?> exam(
+	public ResponseEntity<?> getExam(
 			@PathVariable Long examId
 	) {
 		
@@ -83,6 +83,17 @@ public class ExamResource {
 	) {
 		
 		return ResponseEntity.ok(examService.addExam(exam, authentication.getName()));
+		
+	}
+	
+	@PutMapping("{examId}")
+	@PreAuthorize("@examService.canAccess(authentication.name, #examId, authentication.authorities) == true")
+	public ResponseEntity<?> updateExam(
+			@PathVariable Long examId,
+			@RequestBody Exam exam
+	) {
+		
+		return ResponseEntity.ok(examService.updateExam(exam, examId));
 		
 	}
 	

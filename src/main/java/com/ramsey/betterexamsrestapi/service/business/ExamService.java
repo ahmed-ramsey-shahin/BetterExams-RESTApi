@@ -5,12 +5,10 @@ import com.ramsey.betterexamsrestapi.entity.Teacher;
 import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
 import com.ramsey.betterexamsrestapi.error.ExamNotFoundError;
-import com.ramsey.betterexamsrestapi.error.ExamNotSavedError;
 import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
 import com.ramsey.betterexamsrestapi.repo.ExamRepo;
 import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ExamService {
 	
 	private final UserService userService;
@@ -33,20 +30,10 @@ public class ExamService {
 		
 		User user = userService.loadUserByUsername(username);
 		Teacher teacher = teacherService.get(user);
-		
-		if(
-				teacher.getExams().stream()
-						.anyMatch(exam -> exam.getName().equalsIgnoreCase(newExam.getName()))
-		) {
-			
-			throw new ExamNotSavedError("You have created this exam before");
-			
-		}
-		
 		examRepo.save(newExam);
 		teacher.getExams().add(newExam);
 		teacherRepo.save(teacher);
-		return examRepo.findById(newExam.getId()).orElseThrow(ExamNotSavedError::new);
+		return newExam;
 		
 	}
 	
@@ -96,9 +83,7 @@ public class ExamService {
 			
 		} else {
 			
-			var result = examRepo.studentCanAccess(username, examId);
-			log.info(String.valueOf(result));
-			return result;
+			return examRepo.studentCanAccess(username, examId);
 			
 		}
 		
@@ -115,6 +100,18 @@ public class ExamService {
 		}
 		
 		return exam.get();
+		
+	}
+	
+	public Exam updateExam(Exam newExam, Long examId) {
+		
+		Exam exam = get(examId);
+		exam.setQuestions(newExam.getQuestions());
+		exam.setTimeInMinutes(newExam.getTimeInMinutes());
+		exam.setName(newExam.getName());
+		exam.setRequiredScore(newExam.getRequiredScore());
+		examRepo.save(exam);
+		return exam;
 		
 	}
 	

@@ -16,7 +16,6 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({
 			UserAlreadyExistsError.class,
-			PasswordFormatError.class,
 			UserAlreadyVerifiedError.class,
 			VerificationCodeNotCorrectError.class
 	})

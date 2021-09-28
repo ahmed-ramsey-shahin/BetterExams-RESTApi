@@ -78,4 +78,18 @@ public class TeacherService {
 		
 	}
 	
+	public Teacher get(User user) {
+		
+		Optional<Teacher> teacher = teacherRepo.findByUser(user);
+		
+		if(teacher.isEmpty()) {
+			
+			throw new UserNotFoundError(user.getUsername());
+			
+		}
+		
+		return teacher.get();
+		
+	}
+	
 }

@@ -82,7 +82,7 @@ public class UserService implements UserDetailsService {
 		
 		if(user.isEmpty()) {
 			
-			throw new UsernameNotFoundException(username);
+			throw new UserNotFoundError(username);
 			
 		}
 		
@@ -133,7 +133,7 @@ public class UserService implements UserDetailsService {
 	}
 	
 	@Override
-	public User loadUserByUsername(String username) throws UsernameNotFoundException {
+	public User loadUserByUsername(String username) throws UserNotFoundError {
 		
 		Optional<User> user = userRepo.findById(username);
 		

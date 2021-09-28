@@ -4,12 +4,12 @@ import com.ramsey.betterexamsrestapi.entity.Student;
 import com.ramsey.betterexamsrestapi.entity.Teacher;
 import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
+import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
 import com.ramsey.betterexamsrestapi.repo.StudentRepo;
 import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import com.ramsey.betterexamsrestapi.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class TeacherService {
 		
 		if(teacher.isEmpty()) {
 			
-			throw new UsernameNotFoundException(username);
+			throw new UserNotFoundError(username);
 			
 		}
 		
@@ -65,11 +65,11 @@ public class TeacherService {
 		
 		if(teacher.isEmpty()) {
 			
-			throw new UsernameNotFoundException(teacherUsername);
+			throw new UserNotFoundError(teacherUsername);
 			
 		} else if(student.isEmpty()) {
 			
-			throw new UsernameNotFoundException(studentUsername);
+			throw new UserNotFoundError(studentUsername);
 			
 		}
 		

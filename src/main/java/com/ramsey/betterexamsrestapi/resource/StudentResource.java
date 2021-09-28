@@ -1,11 +1,8 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
-import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -53,45 +50,19 @@ public class StudentResource {
 		
 		User user;
 		
-		try {
+		if(
+				authentication.getAuthorities()
+						.stream()
+						.anyMatch(
+								authority -> authority.getAuthority().equals("ROLE_TEACHER")
+						)
+		) {
 			
-			if(
-					authentication.getAuthorities()
-							.stream()
-							.anyMatch(
-									authority -> authority.getAuthority().equals("ROLE_TEACHER")
-							)
-			) {
-				
-				user = studentService.getStudentForTeacher(username, authentication.getName());
-				
-			} else {
-				
-				user = studentService.getStudent(username);
-				
-			}
+			user = studentService.getStudentForTeacher(username, authentication.getName());
 			
-		} catch(UserNotFoundError err) {
+		} else {
 			
-			var status = HttpStatus.NOT_FOUND;
-			return ResponseEntity.status(status).body(
-					new ErrorResponse(
-							status.value(),
-							status.getReasonPhrase(),
-							err.getMessage()
-					)
-			);
-			
-		} catch(Exception ex) {
-			
-			var status = HttpStatus.INTERNAL_SERVER_ERROR;
-			return ResponseEntity.status(status).body(
-					new ErrorResponse(
-							status.value(),
-							status.getReasonPhrase(),
-							ex.getMessage()
-					)
-			);
+			user = studentService.getStudent(username);
 			
 		}
 		

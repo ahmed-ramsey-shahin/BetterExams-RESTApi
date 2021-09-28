@@ -1,11 +1,8 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
-import com.ramsey.betterexamsrestapi.pojo.ErrorResponse;
 import com.ramsey.betterexamsrestapi.service.business.TeacherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -49,27 +46,7 @@ public class TeacherResource {
 			@PathVariable String username
 	) {
 		
-		User user;
-		
-		try {
-			
-			user = teacherService.get(username);
-			
-		} catch(UserNotFoundError err) {
-			
-			var status = HttpStatus.NOT_FOUND;
-			return ResponseEntity.status(status)
-					.body(
-							new ErrorResponse(
-									status.value(),
-									status.getReasonPhrase(),
-									err.getMessage()
-							)
-					);
-			
-		}
-		
-		return ResponseEntity.ok(user);
+		return ResponseEntity.ok(teacherService.get(username));
 		
 	}
 	
@@ -80,27 +57,10 @@ public class TeacherResource {
 			Authentication authentication
 	) {
 		
-		try {
-			
-			teacherService.addStudentToTeacher(
-					authentication.getName(),
-					username
-			);
-			
-		} catch(UserNotFoundError err) {
-			
-			var status = HttpStatus.NOT_FOUND;
-			return ResponseEntity.status(status)
-					.body(
-							new ErrorResponse(
-									status.value(),
-									status.getReasonPhrase(),
-									err.getMessage()
-							)
-					);
-			
-		}
-		
+		teacherService.addStudentToTeacher(
+				authentication.getName(),
+				username
+		);
 		return ResponseEntity.noContent().build();
 		
 	}

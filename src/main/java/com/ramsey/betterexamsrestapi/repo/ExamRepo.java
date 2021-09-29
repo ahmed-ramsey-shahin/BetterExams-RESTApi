@@ -20,5 +20,7 @@ public interface ExamRepo extends CrudRepository<Exam, Long> {
 			"FROM Teacher t, IN(t.students) s, IN(t.exams) e " +
 			"WHERE s.user.username = :username AND e.id = :id")
 	Boolean studentCanAccess(String username, Long id);
+	@Query("SELECT e FROM Teacher t, IN(t.exams) e WHERE t.user.username = :username")
+	List<Exam> getTeacherExams(String username, Pageable pageable);
 	
 }

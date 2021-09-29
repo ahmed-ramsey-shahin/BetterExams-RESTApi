@@ -92,4 +92,10 @@ public class TeacherService {
 		
 	}
 	
+	public Boolean canStudentAccess(String username, String teacherUsername) {
+		
+		return teacherRepo.canStudentAccess(username, teacherUsername);
+		
+	}
+	
 }

@@ -112,4 +112,22 @@ public class ExamService {
 		
 	}
 	
+	public List<Exam> teacherExams(String username, Integer limit) {
+		
+		return teacherExams(username, Pageable.ofSize(limit));
+		
+	}
+	
+	public List<Exam> teacherExams(String username) {
+		
+		return teacherExams(username, Pageable.unpaged());
+		
+	}
+	
+	private List<Exam> teacherExams(String username, Pageable pageable) {
+		
+		return examRepo.getTeacherExams(username, pageable);
+		
+	}
+	
 }

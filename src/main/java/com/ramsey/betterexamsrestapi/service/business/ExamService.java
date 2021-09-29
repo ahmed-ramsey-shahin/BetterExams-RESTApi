@@ -68,22 +68,21 @@ public class ExamService {
 		
 	}
 	
-	public boolean canAccess(String username, Long examId, Collection<? extends GrantedAuthority> authorities) {
+	public boolean canAccess(User user, Long examId) {
 		
 		if(
-				authorities.stream()
-						.anyMatch(authority -> authority.getAuthority().equals("ROLE_TEACHER"))
+				user.getType().equals(UserType.TEACHER)
 		) {
 			
-			return teacherRepo.findByUsername(username)
-					.orElseThrow(() -> new UserNotFoundError(username))
+			return teacherRepo.findByUsername(user.getUsername())
+					.orElseThrow(() -> new UserNotFoundError(user.getUsername()))
 					.getExams()
 					.stream()
 					.anyMatch(exam -> exam.getId().equals(examId));
 			
 		} else {
 			
-			return examRepo.studentCanAccess(username, examId);
+			return examRepo.studentCanAccess(user.getUsername(), examId);
 			
 		}
 		

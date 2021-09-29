@@ -2,19 +2,19 @@ package com.ramsey.betterexamsrestapi.service.business;
 
 import com.ramsey.betterexamsrestapi.entity.ExamResult;
 import com.ramsey.betterexamsrestapi.entity.Student;
+import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
+import com.ramsey.betterexamsrestapi.error.ExamNotFoundError;
 import com.ramsey.betterexamsrestapi.error.UserNotFoundError;
 import com.ramsey.betterexamsrestapi.repo.ExamResultRepo;
 import com.ramsey.betterexamsrestapi.repo.StudentRepo;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExamResultService {
@@ -66,6 +66,34 @@ public class ExamResultService {
 		}
 		
 		return examResults;
+		
+	}
+	
+	public boolean canAccess(User user, Long resultId) {
+		
+		if(user.getType().equals(UserType.STUDENT)) {
+			
+			return examResultRepo.studentCanAccess(user.getUsername(), resultId);
+			
+		} else {
+			
+			return examResultRepo.teacherCanAccess(user.getUsername(), resultId);
+			
+		}
+		
+	}
+	
+	public ExamResult get(Long resultId) {
+		
+		Optional<ExamResult> examResult = examResultRepo.findById(resultId);
+		
+		if(examResult.isEmpty()) {
+			
+			throw new ExamNotFoundError(resultId);
+			
+		}
+		
+		return examResult.get();
 		
 	}
 	

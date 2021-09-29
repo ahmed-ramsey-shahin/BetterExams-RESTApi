@@ -48,6 +48,16 @@ public class ExamResultResource {
 		
 	}
 	
+	@GetMapping("{resultId}")
+	@PreAuthorize("@examResultService.canAccess(authentication.details, #resultId)")
+	public ResponseEntity<?> getResult(
+			@PathVariable Long resultId
+	) {
+		
+		return ResponseEntity.ok(examResultService.get(resultId));
+		
+	}
+	
 	@PostMapping
 	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<?> postResult(

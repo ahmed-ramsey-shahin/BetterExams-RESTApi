@@ -2,7 +2,6 @@ package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.Exam;
 import com.ramsey.betterexamsrestapi.entity.User;
-import com.ramsey.betterexamsrestapi.entity.UserType;
 import com.ramsey.betterexamsrestapi.service.business.ExamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,7 @@ public class ExamResource {
 	private final ExamService examService;
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('TEACHER', 'STUDENT')")
 	public ResponseEntity<?> searchExams(
 			@RequestParam(required = false, defaultValue = "") String name,
 			@RequestParam(required = false, defaultValue = "-1") Integer limit,
@@ -52,7 +52,7 @@ public class ExamResource {
 	}
 	
 	@GetMapping("{examId}")
-	@PreAuthorize("@examService.canAccess(authentication.name, #examId, authentication.authorities) == true")
+	@PreAuthorize("@examService.canAccess(authentication.details, #examId)")
 	public ResponseEntity<?> getExam(
 			@PathVariable Long examId
 	) {
@@ -73,7 +73,7 @@ public class ExamResource {
 	}
 	
 	@PutMapping("{examId}")
-	@PreAuthorize("@examService.canAccess(authentication.name, #examId, authentication.authorities) == true")
+	@PreAuthorize("@examService.canAccess(authentication.details, #examId)")
 	public ResponseEntity<?> updateExam(
 			@PathVariable Long examId,
 			@RequestBody Exam exam

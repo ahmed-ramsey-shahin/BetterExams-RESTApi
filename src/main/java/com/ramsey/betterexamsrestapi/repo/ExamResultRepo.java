@@ -19,5 +19,13 @@ public interface ExamResultRepo extends CrudRepository<ExamResult, Long> {
 			"FROM Teacher t, IN(t.students) s, IN(s.results) r " +
 			"WHERE s.user.username = :username")
 	List<ExamResult> findForStudent(String username, Pageable pageable);
+	@Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END " +
+			"FROM Student s, IN(s.results) r " +
+			"WHERE s.user.username = :username AND r.id = :resultId")
+	Boolean studentCanAccess(String username, Long resultId);
+	@Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END " +
+			"FROM Teacher t, IN(t.students) s, IN(s.results) r " +
+			"WHERE t.user.username = :username AND r.id = :resultId")
+	Boolean teacherCanAccess(String username, Long resultId);
 	
 }

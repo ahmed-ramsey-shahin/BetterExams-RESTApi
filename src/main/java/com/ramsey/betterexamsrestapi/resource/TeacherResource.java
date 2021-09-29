@@ -1,6 +1,8 @@
 package com.ramsey.betterexamsrestapi.resource;
 
+import com.ramsey.betterexamsrestapi.entity.ExamResult;
 import com.ramsey.betterexamsrestapi.entity.User;
+import com.ramsey.betterexamsrestapi.service.business.ExamResultService;
 import com.ramsey.betterexamsrestapi.service.business.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 public class TeacherResource {
 	
 	private final TeacherService teacherService;
+	private final ExamResultService examResultService;
 	
 	@GetMapping
 	@PreAuthorize("hasRole('STUDENT')")
@@ -62,6 +65,29 @@ public class TeacherResource {
 				username
 		);
 		return ResponseEntity.noContent().build();
+		
+	}
+	
+	@GetMapping("{username}/results")
+	@PreAuthorize("hasRole('TEACHER') and authentication.name == #username")
+	public ResponseEntity<?> getTeacherResults(
+			@PathVariable String username,
+			@RequestParam(required = false, defaultValue = "-1") Integer limit
+	) {
+		
+		List<ExamResult> results;
+		
+		if(limit <= 0) {
+			
+			results = examResultService.teacherResults(username);
+			
+		} else {
+			
+			results = examResultService.teacherResults(username, limit);
+			
+		}
+		
+		return ResponseEntity.ok(results);
 		
 	}
 	

@@ -1,7 +1,9 @@
 package com.ramsey.betterexamsrestapi.resource;
 
+import com.ramsey.betterexamsrestapi.entity.ExamResult;
 import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
+import com.ramsey.betterexamsrestapi.service.business.ExamResultService;
 import com.ramsey.betterexamsrestapi.service.business.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.List;
 public class StudentResource {
 	
 	private final StudentService studentService;
+	private final ExamResultService examResultService;
 	
 	@GetMapping
 	@PreAuthorize("hasRole('TEACHER')")
@@ -65,6 +68,47 @@ public class StudentResource {
 		}
 		
 		return ResponseEntity.ok(user);
+		
+	}
+	
+	@GetMapping("{username}/results")
+	@PreAuthorize("hasRole('TEACHER') or (hasRole('STUDENT') and authentication.name == #username)")
+	public ResponseEntity<?> getStudentResults(
+			@PathVariable String username,
+			@RequestParam(required = false, defaultValue = "-1") Integer limit,
+			Authentication authentication
+	) {
+		
+		List<ExamResult> results;
+		User user = (User) authentication.getDetails();
+		
+		if(user.getType().equals(UserType.TEACHER)) {
+			
+			if(limit <= 0) {
+				
+				results = examResultService.studentResultsForTeacher(username, user.getUsername());
+				
+			} else {
+				
+				results = examResultService.studentResultsForTeacher(username, user.getUsername(), limit);
+				
+			}
+			
+		} else {
+			
+			if(limit <= 0) {
+				
+				results = examResultService.studentResults(username);
+				
+			} else {
+				
+				results = examResultService.studentResults(username, limit);
+				
+			}
+			
+		}
+		
+		return ResponseEntity.ok(results);
 		
 	}
 	

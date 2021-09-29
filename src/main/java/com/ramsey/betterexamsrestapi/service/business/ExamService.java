@@ -10,10 +10,8 @@ import com.ramsey.betterexamsrestapi.repo.ExamRepo;
 import com.ramsey.betterexamsrestapi.repo.TeacherRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

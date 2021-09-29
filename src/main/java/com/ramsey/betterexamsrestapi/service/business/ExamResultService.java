@@ -97,4 +97,76 @@ public class ExamResultService {
 		
 	}
 	
+	public List<ExamResult> studentResults(String username, Integer limit) {
+		
+		return studentResults(username, Pageable.ofSize(limit));
+		
+	}
+	
+	public List<ExamResult> studentResults(String username) {
+		
+		return studentResults(username, Pageable.unpaged());
+		
+	}
+	
+	private List<ExamResult> studentResults(String username, Pageable pageable) {
+		
+		return examResultRepo.studentResults(username, pageable);
+		
+	}
+	
+	public List<ExamResult> teacherResults(String username) {
+		
+		return teacherResults(username, Pageable.unpaged());
+		
+	}
+	
+	public List<ExamResult> teacherResults(String username, Integer limit) {
+		
+		return teacherResults(username, Pageable.ofSize(limit));
+		
+	}
+	
+	private List<ExamResult> teacherResults(String username, Pageable pageable) {
+		
+		return examResultRepo.teacherResults(username, pageable);
+		
+	}
+	
+	public List<ExamResult> examResults(Long examId) {
+		
+		return examResults(examId, Pageable.unpaged());
+		
+	}
+	
+	public List<ExamResult> examResults(Long examId, Integer limit) {
+		
+		return examResults(examId, Pageable.ofSize(limit));
+		
+	}
+	
+	private List<ExamResult> examResults(Long examId, Pageable pageable) {
+		
+		return examResultRepo.examResults(examId, pageable);
+		
+	}
+	
+	public List<ExamResult> studentResultsForTeacher(String studentUsername, String teacherUsername) {
+		
+		return studentResultsForTeacher(studentUsername, teacherUsername, Pageable.unpaged());
+		
+	}
+	
+	public List<ExamResult> studentResultsForTeacher(String studentUsername, String teacherUsername, Integer limit) {
+		
+		return studentResultsForTeacher(studentUsername, teacherUsername, Pageable.ofSize(limit));
+		
+	}
+	
+	private List<ExamResult> studentResultsForTeacher(String studentUsername, String teacherUsername, Pageable pageable) {
+		
+		return examResultRepo.studentResultsForTeacher(studentUsername, teacherUsername, pageable);
+		
+	}
+	
 }

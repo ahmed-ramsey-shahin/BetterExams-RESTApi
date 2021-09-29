@@ -1,6 +1,7 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.User;
+import com.ramsey.betterexamsrestapi.entity.UserType;
 import com.ramsey.betterexamsrestapi.service.business.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,11 +52,8 @@ public class StudentResource {
 		User user;
 		
 		if(
-				authentication.getAuthorities()
-						.stream()
-						.anyMatch(
-								authority -> authority.getAuthority().equals("ROLE_TEACHER")
-						)
+				((User) authentication.getDetails()).getType()
+						.equals(UserType.TEACHER)
 		) {
 			
 			user = studentService.getStudentForTeacher(username, authentication.getName());

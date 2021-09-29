@@ -1,6 +1,7 @@
 package com.ramsey.betterexamsrestapi.resource;
 
 import com.ramsey.betterexamsrestapi.entity.Exam;
+import com.ramsey.betterexamsrestapi.entity.User;
 import com.ramsey.betterexamsrestapi.entity.UserType;
 import com.ramsey.betterexamsrestapi.service.business.ExamService;
 import lombok.RequiredArgsConstructor;
@@ -25,28 +26,13 @@ public class ExamResource {
 			Authentication authentication
 	) {
 		
-		UserType userType;
 		List<Exam> exams;
-		
-		if(
-				authentication.getAuthorities()
-						.stream()
-						.anyMatch(authority -> authority.getAuthority().equals("ROLE_TEACHER"))
-		) {
-			
-			userType = UserType.TEACHER;
-			
-		} else {
-			
-			userType = UserType.STUDENT;
-			
-		}
 		
 		if(limit <= 0) {
 			
 			exams = examService.searchExam(
 					authentication.getName(),
-					userType,
+					((User) authentication.getDetails()).getType(),
 					name
 			);
 			
@@ -54,7 +40,7 @@ public class ExamResource {
 			
 			exams = examService.searchExam(
 					authentication.getName(),
-					userType,
+					((User) authentication.getDetails()).getType(),
 					name,
 					limit
 			);

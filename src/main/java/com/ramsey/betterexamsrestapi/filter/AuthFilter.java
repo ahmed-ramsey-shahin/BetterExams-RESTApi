@@ -118,6 +118,7 @@ public class AuthFilter extends OncePerRequestFilter {
 									user.getPassword(),
 									user.getAuthorities()
 							);
+							auth.setDetails(user);
 							context.setAuthentication(auth);
 							SecurityContextHolder.setContext(context);
 							filterChain.doFilter(request, response);
